@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoderKaushal Portfolio</title>
+
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        zincBlack: '#030712',
+                        accentPurple: '#8b5cf6',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-zincBlack text-white overflow-x-hidden selection:bg-accentPurple selection:text-white">
+
+    <div id="preloader" class="fixed inset-0 z-[100] flex items-center justify-center bg-zincBlack transition-opacity duration-700">
+        <img src="assets/logo.svg" alt="CoderKaushal" class="w-16 h-16 animate-pulse">
+    </div>
+
+    <div class="fixed inset-0 z-0 pointer-events-none opacity-5 mix-blend-overlay bg-[url('assets/noise.png')]"></div>
+
+    <nav class="fixed top-0 w-full z-40 backdrop-blur-xl bg-zincBlack/50 border-b border-white/5 px-6 py-4 flex justify-between items-center transition-all duration-300">
+        <div class="flex items-center gap-3 logo-hover cursor-pointer">
+            <img src="assets/logo.svg" alt="CK Logo" class="w-8 h-8">
+            <span class="font-bold tracking-widest hidden md:block text-sm">CODERKAUSHAL</span>
+        </div>
+
+        <div id="live-status" onclick="document.getElementById('intake-form').scrollIntoView({ behavior: 'smooth' });" class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs tracking-wide cursor-pointer hover:bg-white/10 hover:border-accentPurple transition">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]"></span>
+            <span class="text-gray-300">Available for Architecture</span>
+        </div>
+    </nav>
+
+    <main class="relative z-10 container mx-auto px-6 pt-36 pb-32 max-w-6xl">
+
+        <section class="min-h-[60vh] flex flex-col md:flex-row items-center justify-between gap-12 animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000">
+            <div class="flex-1 space-y-6">
+               <div class="h-[200px] sm:h-[220px] md:h-[250px] lg:h-[280px] w-full block">
+                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight">
+                        Architecting <br>
+                        <span id="typewriter" class="text-transparent bg-clip-text bg-gradient-to-r from-accentPurple to-indigo-400"></span><span class="animate-pulse text-accentPurple">|</span>
+                    </h1>
+                </div>
+                <p class="text-gray-400 text-lg max-w-xl leading-relaxed">
+                    Not just websites. I build high-performance decoupled systems, Portfolio Websites, Premium Apps, secure client portals, and native admin engines.
+                </p>
+            </div>
+
+            <div class="relative flex-1 flex justify-center items-center">
+                <div class="absolute inset-0 bg-accentPurple rounded-full blur-[120px] opacity-20 w-64 h-64 m-auto animate-pulse"></div>
+                <div class="relative z-10 w-72 h-72 rounded-3xl border border-white/10 overflow-hidden shadow-2xl glass-card">
+                    <img src="assets/profile.jpeg" alt="Ashutosh Kaushal" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </section>
+
+       <section class="mt-32">
+    <div id="client-works" class="scroll-mt-24 mb-20 animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000">
+        <div class="flex items-center gap-4 mb-8">
+            <span class="text-2xl">🌍</span>
+            <h2 class="text-2xl font-bold tracking-wide">Client Works</h2>
+        </div>
+        <div id="grid-client" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <div id="personal-works" class="scroll-mt-24 mb-20 animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000">
+        <div class="flex items-center gap-4 mb-8">
+            <span class="text-2xl">🚀</span>
+            <h2 class="text-2xl font-bold tracking-wide">Personal Works</h2>
+        </div>
+        <div id="grid-personal" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+</section>
+
+        <section id="about" class="mb-20 animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000">
+            <div class="glass-card p-10 relative overflow-hidden flex flex-col md:flex-row gap-10 items-center">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-accentPurple blur-[100px] opacity-20"></div>
+
+                <div class="flex-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-2 h-8 bg-accentPurple rounded-full"></div>
+                        <h2 class="text-3xl font-bold tracking-wide">The Architect Behind the Code</h2>
+                    </div>
+                    <p class="text-gray-300 text-lg leading-relaxed mb-8">
+                        I am Ashutosh Kaushal. I specialize in building end-to-end digital ecosystems. From raw Vanilla JavaScript performance to robust Firebase architectures and secure Kotlin Admin apps, I build products that load instantly and operate securely. If it's standard, I don't build it. If it's an experience, I architect it.
+                    </p>
+
+                    <div class="flex gap-4">
+                        <a href="https://instagram.com/ashu7061a" target="_blank" class="px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-accentPurple transition-all flex items-center gap-2 text-sm text-gray-300">
+                            <span>Instagram</span>
+                        </a>
+                        <a href="https://www.linkedin.com/in/ashutosh-kaushal1412" target="_blank" class="px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl hover:bg-[#0a66c2]/20 hover:border-[#0a66c2] transition-all flex items-center gap-2 text-sm text-gray-300">
+                            <span>LinkedIn</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex justify-center items-center w-48 h-48 rounded-full border border-white/5 bg-white/5 p-8 relative">
+                    <div class="absolute inset-0 bg-accentPurple/20 blur-3xl rounded-full animate-pulse"></div>
+                    <img src="assets/logo.svg" alt="CK Sign" class="w-full opacity-50">
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-32 animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000">
+            <section id="components" class="mb-32 animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000"></section>
+            <div class="flex items-center gap-4 mb-8">
+                <span class="text-2xl">💻</span>
+                <h2 class="text-2xl font-bold tracking-wide">Ready to Use Components</h2>
+            </div>
+            <div id="grid-normal" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <section id="intake-form" class="animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000 scroll-mt-32">
+            <div class="glass-card p-10 max-w-3xl mx-auto border-t-4 border-t-accentPurple relative overflow-hidden">
+                <div class="absolute bottom-0 left-0 w-full h-32 bg-accentPurple blur-[120px] opacity-10 pointer-events-none"></div>
+
+                <div class="text-center mb-8 relative z-10">
+                    <h2 class="text-3xl font-bold tracking-wide text-white mb-2">Initiate a Project</h2>
+                    <p class="text-gray-400">Strictly for high-end architectures. No bargaining, strict timelines.</p>
+                </div>
+
+                <form id="leadForm" class="space-y-6 relative z-10">
+                    
+                    <input type="text" id="leadReference" placeholder="Reference Project Link (Leave blank if none)" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-accentPurple transition-colors">
+                    
+                    <textarea id="leadFeatures" rows="2" placeholder="Briefly describe the main features you want (e.g., E-commerce, Login, Admin Panel) *" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-accentPurple transition-colors resize-none mt-6"></textarea>
+
+                    <select id="leadProjectType" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accentPurple transition-colors appearance-none mt-6">
+                        <option value="" disabled selected>What do you want to build?</option>
+                        <option value="website">Website Architecture</option>
+                        <option value="app">Mobile App (Android/iOS)</option>
+                        <option value="ecosystem">Full Ecosystem (Web + App)</option>
+                        <option value="component">Customize Micro-Component</option>
+                    </select>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <input type="text" id="leadName" placeholder="Your Name" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-accentPurple transition-colors">
+                        <input type="email" id="leadEmail" placeholder="Email Address" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-accentPurple transition-colors">
+                        <input type="tel" id="leadWhatsapp" placeholder="WhatsApp Number" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-accentPurple transition-colors">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <select id="leadBudget" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accentPurple transition-colors appearance-none">
+                            <option value="" disabled selected>Estimated Budget</option>
+                            <option value="least-budget">Least Budget (Under ₹1,500)</option>
+                            <option value="1500-3000">₹1,500 - ₹3,000</option>
+                            <option value="3000-5000">₹3,000 - ₹5,000</option>
+                            <option value="5000+">₹5,000+</option>
+                        </select>
+                        <input type="text" id="leadTimeline" placeholder="Required Timeline (e.g., 2 Weeks)" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-accentPurple transition-colors">
+                    </div>
+
+                    <label class="flex items-center gap-3 cursor-pointer mt-4">
+                        <input type="checkbox" required class="w-5 h-5 accent-accentPurple bg-black/40 border-white/10 rounded">
+                        <span class="text-gray-400 text-sm">I agree to CoderKaushal's strict working criteria.</span>
+                    </label>
+
+                    <button type="submit" class="w-full bg-accentPurple text-white font-bold py-4 rounded-xl hover:bg-purple-500 hover:shadow-[0_0_20px_rgba(139,92,246,0.4)] transition-all">
+                        Submit Architecture Request
+                    </button>
+
+                    <p id="formMessage" class="text-center text-sm hidden mt-4"></p>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="freeComponentModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-md p-4 transition-opacity duration-300 opacity-0">
+        <div class="glass-card w-full max-w-md p-8 relative transform scale-95 transition-transform duration-300 shadow-2xl border-t-4 border-t-accentPurple" id="modalContentBox">
+            
+            <button onclick="closeComponentModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-xl font-bold">&times;</button>
+            
+            <div class="mb-6 text-center">
+                <span class="text-xs text-accentPurple font-bold uppercase tracking-widest bg-accentPurple/10 px-3 py-1 rounded-full">Developer Resource</span>
+                <h3 id="modalTitle" class="text-2xl font-bold text-white mt-4">Component Source</h3>
+                <p class="text-sm text-gray-400 mt-2">Grab the free code to use in your projects, or hire us to integrate it for you.</p>
+            </div>
+
+            <div class="bg-black/30 border border-white/5 rounded-xl p-6 mb-6 text-center">
+                <h4 class="text-white font-bold mb-4 text-sm">Path 1: Do It Yourself (Free)</h4>
+                <div class="flex gap-3">
+                    <a id="modalLiveLink" href="#" target="_blank" class="flex-1 py-3 bg-white/10 text-white rounded-lg text-sm font-bold hover:bg-white/20 transition border border-white/10">View Preview</a>
+                    <a id="modalRepoLink" href="#" target="_blank" class="flex-1 py-3 bg-accentPurple text-white rounded-lg text-sm font-bold hover:bg-purple-500 transition shadow-[0_0_10px_rgba(139,92,246,0.3)]">Get Code</a>
+                </div>
+            </div>
+
+            <div class="border-t border-white/10 pt-6 text-center">
+                <p class="text-xs text-gray-500 mb-3 uppercase tracking-widest">Need custom colors or logic?</p>
+                <button onclick="triggerPaidCustomization()" class="w-full bg-white text-black py-3 rounded-lg text-sm font-bold hover:bg-gray-200 active:scale-95 transition-all">
+                    Hire Me to Customize This
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="fixed bottom-10 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+        <div class="pointer-events-auto glass-card px-6 py-3 md:px-8 flex gap-6 md:gap-8 items-center shadow-2xl animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000 delay-500 w-max border border-white/10 backdrop-blur-md bg-white/5 rounded-full">
+            <a href="https://github.com/CoderKaushal-dev" target="_blank" class="text-gray-400 md:hover:text-white md:hover:-translate-y-1.5 active:scale-90 transition-all duration-300" title="Brand GitHub">
+                <svg class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+            <a href="https://youtube.com/@CoderKaushal" target="_blank" class="text-gray-400 md:hover:text-red-500 md:hover:-translate-y-1.5 active:scale-90 transition-all duration-300" title="Brand YouTube">
+                <svg class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+            <a href="https://instagram.com/coderkaushal" target="_blank" class="text-gray-400 md:hover:text-pink-500 md:hover:-translate-y-1.5 active:scale-90 transition-all duration-300" title="Brand Instagram">
+                 <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/portfolio.js"></script>
+</body>
+</html>
