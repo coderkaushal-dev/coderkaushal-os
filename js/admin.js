@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         let col = 'inquiries';
         if(currentTab === 'workspaces') col = 'client_workspaces';
-        if(currentTab === 'history') col = 'audit_logs'; // Naya History Collection
+        if(currentTab === 'history') col = 'audit_logs'; 
         
         // History ko audit_timestamp se sort karenge
         let orderField = currentTab === 'history' ? 'audit_timestamp' : 'timestamp';
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>`;
     }
 
-    // 🚨 NAYA: HISTORY CARD
+    // HISTORY CARD
     function renderHistoryCard(doc) {
         const log = doc.data();
         const actionColor = log.audit_action === 'Approved' ? 'text-green-400' : 'text-red-400';
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>`;
     }
 
-    // 6. VIEW FULL LEAD DETAILS LOGIC
+    // 6. VIEW FULL LEAD DETAILS LOGIC (With Communication Links)
     window.viewLeadDetails = async (id) => {
         const doc = await db.collection('inquiries').doc(id).get();
         if(!doc.exists) return;
@@ -144,11 +144,29 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('currentLeadId').value = id;
         document.getElementById('ldName').textContent = data.name;
         document.getElementById('ldType').textContent = data.projectType || 'N/A';
-        document.getElementById('ldEmail').textContent = data.email;
-        document.getElementById('ldWhatsapp').textContent = data.whatsapp;
+
+        // ✅ FIX: Email Clickable
+        const emailEl = document.getElementById('ldEmail');
+        if(emailEl) {
+            emailEl.textContent = data.email;
+            emailEl.href = `mailto:${data.email}?subject=Regarding Your Architecture Request - CoderKaushal`;
+        }
+
+        // ✅ FIX: WhatsApp Clickable
+        const waEl = document.getElementById('ldWhatsapp');
+        if(waEl) {
+            waEl.textContent = data.whatsapp;
+            const cleanWa = data.whatsapp.replace(/\D/g, ''); // Remove spaces/symbols
+            waEl.href = `https://wa.me/${cleanWa}?text=Hi ${data.name}, I am Ashutosh Kaushal reaching out regarding your architecture request...`;
+        }
+        
         document.getElementById('ldBudget').textContent = data.budget;
         document.getElementById('ldTimeline').textContent = data.timeline;
         document.getElementById('ldFeatures').textContent = data.features;
+
+        // ✅ FIX: Reset Price Input
+        const priceInput = document.getElementById('onboardPrice');
+        if(priceInput) priceInput.value = '';
         
         const refLink = document.getElementById('ldRef');
         if(data.reference && data.reference !== "None") {
@@ -163,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.classList.add('flex');
 
         document.getElementById('btnApproveMain').onclick = () => approveLead(id);
-        document.getElementById('btnRejectMain').onclick = () => rejectLead(id); // Using new Reject Logic
+        document.getElementById('btnRejectMain').onclick = () => rejectLead(id);
     };
 
     window.closeLeadModal = () => {
@@ -276,58 +294,70 @@ document.addEventListener("DOMContentLoaded", () => {
         currentTab = tab;
         const lBtn = document.getElementById('tab-leads');
         const wBtn = document.getElementById('tab-workspaces');
-        const hBtn = document.getElementById('tab-history'); // Naya History Tab
+        const hBtn = document.getElementById('tab-history'); 
         
-        // Reset all
         [lBtn, wBtn, hBtn].forEach(btn => {
             if(btn) btn.className = "text-sm font-bold text-gray-500 pb-4 hover:text-white transition-all";
         });
         
-        // Active Style
         const activeBtn = document.getElementById(`tab-${tab}`);
         if(activeBtn) activeBtn.className = "text-sm font-bold text-accentPurple border-b-2 border-accentPurple pb-4 transition-all";
         
         fetchData();
     };
 
-    // 🚨 10. APPROVE LEAD (WITH HISTORY & AUTO EMAIL)
+    // 🚨 10. APPROVE LEAD (WITH PRICE LOCK & AUTO EMAIL)
     window.approveLead = async (id) => {
-        if(!confirm("Onboard Client and Generate Portal?")) return;
+        const priceInputEl = document.getElementById('onboardPrice');
+        const priceInput = priceInputEl ? priceInputEl.value : null;
+        
+        // Agar price nahi dala toh rok do
+        if(!priceInput || priceInput <= 0) {
+            alert("Please set the Final Agreed Price (₹) before onboarding this client.");
+            if(priceInputEl) priceInputEl.focus();
+            return;
+        }
+
+        const finalPrice = Number(priceInput);
+
+        if(!confirm(`Onboard Client for ₹${finalPrice.toLocaleString('en-IN')} and Generate Portal?`)) return;
+        
         try {
             const leadRef = db.collection('inquiries').doc(id);
             const data = (await leadRef.get()).data();
             const portalId = "CK-" + Math.floor(10000 + Math.random() * 90000);
             const pin = Math.floor(1000 + Math.random() * 9000);
             
-            // A. Move to Workspace
+            // A. Move to Workspace (With Final Price)
             await db.collection('client_workspaces').add({
                 ...data,
                 portalId: portalId,
                 portalPin: pin,
                 status: 'Architecture in Progress',
-                total_price: 0,
+                total_price: finalPrice, 
                 paid_amount: 0,
                 is_preview_active: false,
                 admin_locked: false,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            // B. SAVE TO HISTORY LOG (Never Delete)
+            // B. SAVE TO HISTORY LOG
             await db.collection('audit_logs').add({
                 ...data,
                 portalId: portalId,
+                agreed_price: finalPrice,
                 audit_action: 'Approved',
                 audit_timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
             
-            // C. Delete from Inquiries (Queue)
+            // C. Delete from Inquiries
             await leadRef.delete(); 
             closeLeadModal();
-            showToast("Client Onboarded & Logged.");
+            showToast("Client Onboarded & Portal Created.");
 
             // D. AUTO EMAIL GENERATOR
             const emailSubject = encodeURIComponent(`Your Project Portal is Ready | CoderKaushal`);
-            const emailBody = encodeURIComponent(`Hello ${data.name},\n\nYour architecture request has been approved. Here are your secure portal credentials:\n\n🔗 Portal Link: https://coderkaushal.com/portal\n🆔 Portal ID: ${portalId}\n🔑 Secure PIN: ${pin}\n\nYou can track live progress, review architecture, and manage milestones directly from your portal.\n\nBest Regards,\nAshutosh Kaushal\nLead Architect`);
+            const emailBody = encodeURIComponent(`Hello ${data.name},\n\nYour architecture request has been approved for the agreed value of ₹${finalPrice.toLocaleString('en-IN')}.\n\nHere are your secure portal credentials:\n\n🔗 Portal Link: https://coderkaushal.com/portal\n🆔 Portal ID: ${portalId}\n🔑 Secure PIN: ${pin}\n\nYou can track live progress, review architecture, and manage milestones directly from your portal.\n\nBest Regards,\nAshutosh Kaushal\nLead Architect`);
             window.location.href = `mailto:${data.email}?subject=${emailSubject}&body=${emailBody}`;
 
         } catch (err) {
@@ -336,14 +366,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // 🚨 11. REJECT LEAD (SAVE TO HISTORY INSTEAD OF JUST DELETING)
+    // 11. REJECT LEAD
     window.rejectLead = async (id) => {
         if(!confirm("Reject lead? It will be moved to History logs.")) return;
         try {
             const leadRef = db.collection('inquiries').doc(id);
             const data = (await leadRef.get()).data();
 
-            // Save to History Log
             await db.collection('audit_logs').add({
                 ...data,
                 audit_action: 'Rejected',
@@ -358,7 +387,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // 🚨 12. SMART SEARCH FUNCTION (Instant Filter)
+    // 12. SMART SEARCH FUNCTION
     window.searchDashboard = (query) => {
         const term = query.toLowerCase();
         const cards = document.querySelectorAll('.searchable-card');
@@ -366,9 +395,9 @@ document.addEventListener("DOMContentLoaded", () => {
         cards.forEach(card => {
             const textContent = card.innerText.toLowerCase();
             if (textContent.includes(term)) {
-                card.style.display = 'flex'; // Restore flex behavior
+                card.style.display = 'flex'; 
             } else {
-                card.style.display = 'none'; // Hide
+                card.style.display = 'none'; 
             }
         });
     };

@@ -17,38 +17,53 @@ if (loginForm) {
         
         const submitBtn = loginForm.querySelector('button');
         submitBtn.textContent = 'Verifying Credentials...';
+        loginError.classList.add('hidden'); // Chhupao error shuru mein
         
+        // Ensure ID is uppercase and no spaces
         const clientId = document.getElementById('clientId').value.trim().toUpperCase();
-        const clientPin = document.getElementById('clientPin').value.trim();
+        // PIN ko number form mein rakho
+        const clientPin = Number(document.getElementById('clientPin').value.trim());
 
         try {
+            // 🚨 NAYA FIX: Sirf ID se search karenge (No Index Error)
             const querySnapshot = await db.collection('client_workspaces')
-                .where('client_id', '==', clientId)
-                .where('pin', '==', clientPin)
+                .where('portalId', '==', clientId)
                 .get();
 
             if (!querySnapshot.empty) {
+                // Client mil gaya, ab check karenge ki PIN match hota hai ya nahi
                 const clientDoc = querySnapshot.docs[0];
-                currentWorkspaceId = clientDoc.id; 
-                
-                document.getElementById('login-view').classList.add('hidden');
-                document.getElementById('dashboard-view').classList.remove('hidden');
-                document.getElementById('dashboard-view').classList.add('flex');
-                
-                document.getElementById('auth-status').innerHTML = `
-                    <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e] animate-pulse"></span>
-                    <span class="text-xs text-green-400 font-mono">Encrypted Session Active</span>
-                `;
+                const data = clientDoc.data();
 
-                initLiveDashboard(clientDoc.id);
+                if (data.portalPin === clientPin) {
+                    // PIN Sahi Hai -> Login Success
+                    currentWorkspaceId = clientDoc.id; 
+                    
+                    document.getElementById('login-view').classList.add('hidden');
+                    document.getElementById('dashboard-view').classList.remove('hidden');
+                    document.getElementById('dashboard-view').classList.add('flex');
+                    
+                    document.getElementById('auth-status').innerHTML = `
+                        <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e] animate-pulse"></span>
+                        <span class="text-xs text-green-400 font-mono">Encrypted Session Active</span>
+                    `;
 
+                    initLiveDashboard(clientDoc.id);
+
+                } else {
+                    // PIN Galat Hai
+                    loginError.textContent = "ACCESS DENIED. Incorrect PIN.";
+                    loginError.classList.remove('hidden');
+                }
             } else {
-                loginError.textContent = "ACCESS DENIED. Invalid ID or PIN.";
+                // Client ID nahi mili
+                loginError.textContent = "ACCESS DENIED. Workspace ID not found.";
                 loginError.classList.remove('hidden');
             }
         } catch (error) {
             console.error("Login Error:", error);
-            loginError.textContent = "SERVER ERROR. Connection Refused.";
+            // Firebase Security rules ya network ka error yaha dikhega
+            loginError.textContent = "CONNECTION REFUSED. Check Firebase Rules.";
             loginError.classList.remove('hidden');
         } finally {
             submitBtn.textContent = 'Initiate Handshake';
@@ -66,7 +81,7 @@ function initLiveDashboard(docId) {
         const data = doc.data();
 
         // Basic Info
-        document.getElementById('dash-workspace-id').textContent = data.client_id;
+        document.getElementById('dash-workspace-id').textContent = data.portalId || 'Unknown';
         document.getElementById('dash-status').textContent = data.status || 'Architecture in Progress';
         
         // Price Info 
@@ -83,13 +98,12 @@ function initLiveDashboard(docId) {
         // Update Progress Bar
         const progressBar = document.getElementById('paymentProgressBar');
         const statusText = document.getElementById('paymentStatusText');
-        const nextUnlockText = document.getElementById('nextUnlockText'); // Make sure this exists in HTML
+        const nextUnlockText = document.getElementById('nextUnlockText'); 
 
         if(progressBar && statusText) {
             progressBar.style.width = `${paidPercentage}%`;
             statusText.textContent = `${paidPercentage}% Paid (₹${alreadyPaid.toLocaleString('en-IN')})`;
 
-            // NAYA: MATH LOGIC: "Kitna aur dena hai?"
             if (nextUnlockText) {
                 const targetPreview = totalPrice * 0.60; // 60% for Live Preview
                 const targetFinal = totalPrice;          // 100% for Final Delivery
@@ -108,7 +122,7 @@ function initLiveDashboard(docId) {
             // Hide Payment Input if 100% Paid
             const paymentInputArea = document.getElementById('paymentInputArea');
             if(paymentInputArea) {
-                if(paidPercentage >= 100) {
+                if(paidPercentage >= 100 || totalPrice === 0) {
                     paymentInputArea.classList.add('hidden');
                     document.getElementById('paymentArea')?.classList.add('hidden');
                 } else {
@@ -134,7 +148,7 @@ function initLiveDashboard(docId) {
 
         // Step 2: Live Preview Unlocked? (Req: >= 60% Paid)
         if (previewSection) {
-            if (paidPercentage >= 60) {
+            if (paidPercentage >= 60 && totalPrice > 0) {
                 previewSection.classList.remove('hidden'); // Show Preview Box
                 const iframe = document.getElementById('livePreviewIframe');
                 const placeholder = document.getElementById('tunnelPlaceholder');
@@ -299,7 +313,6 @@ function setupTimerLogic(data) {
                     last_updated: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                // Gather Data exactly as before
                 if (projectType === 'web' || projectType === 'both') {
                     finalScopeData.web_goal = document.getElementById('q_web_goal').value;
                     finalScopeData.web_audience = document.getElementById('q_web_audience').value;
@@ -362,7 +375,6 @@ if (generateUPIBtn) {
         const customAmountInput = document.getElementById('customPayAmount');
         const amountToPay = parseFloat(customAmountInput.value);
 
-        // NAYA: Strict Validation for Sender Name
         const senderNameInput = document.getElementById('paymentSenderName');
         const senderName = senderNameInput ? senderNameInput.value.trim() : "";
 
@@ -402,11 +414,10 @@ if (generateUPIBtn) {
         document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}&color=000000&bgcolor=ffffff`;
         document.getElementById('qrImage').classList.remove('hidden');
 
-        // NAYA: Auto WhatsApp Message for Proof
-        const MY_WHATSAPP = "91XXXXXXXXXX"; // Yahan apna WhatsApp number daalein (Bina + ke)
+        const MY_WHATSAPP = "91XXXXXXXXXX"; // Aapka WhatsApp
         const whatsappProofBtn = document.getElementById('whatsappProofBtn');
         if (whatsappProofBtn) {
-            const waMsg = `Hi, I am ${currentWorkspaceId}. I have paid ₹${amountToPay.toLocaleString('en-IN')} from the bank account of *${senderName}*. Here is my screenshot proof:`;
+            const waMsg = `Hi, I am Client ID ${data.portalId || currentWorkspaceId}. I have paid ₹${amountToPay.toLocaleString('en-IN')} from the bank account of *${senderName}*. Here is my screenshot proof:`;
             whatsappProofBtn.href = `https://wa.me/${MY_WHATSAPP}?text=${encodeURIComponent(waMsg)}`;
         }
     });
