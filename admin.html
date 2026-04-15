@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Admin | CoderKaushal</title>
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-zincBlack text-white min-h-screen flex flex-col overflow-x-hidden">
+
+    <div class="fixed inset-0 z-0 pointer-events-none opacity-[0.03] bg-noise"></div>
+
+    <section id="login-screen" class="relative z-10 flex-1 flex items-center justify-center p-6 transition-all duration-500">
+        <div class="glass-card p-10 w-full max-w-md border-t-4 border-t-accentPurple text-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-accentPurple/10 blur-[100px] pointer-events-none"></div>
+            <img src="assets/logo.svg" alt="Logo" class="w-16 h-16 mx-auto mb-6 relative z-10">
+            <h2 class="text-3xl font-bold mb-8 relative z-10">System Access</h2>
+            <form id="adminLoginForm" class="space-y-4 relative z-10">
+                <input type="email" id="adminEmail" placeholder="Admin Email" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accentPurple outline-none transition-all">
+                <input type="password" id="adminPassword" placeholder="Password" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accentPurple outline-none transition-all">
+                <button type="submit" class="w-full bg-accentPurple text-white font-bold py-3 rounded-xl hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_20px_rgba(139,92,246,0.2)]">Secure Login</button>
+                <p id="loginError" class="text-red-400 text-sm hidden mt-4"></p>
+            </form>
+        </div>
+    </section>
+
+    <section id="dashboard-screen" class="relative z-10 hidden flex-1 p-4 md:p-10 w-full max-w-7xl mx-auto transition-all duration-500">
+        
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight">Command Center</h1>
+                <p id="live-indicator" class="text-[10px] text-green-500 animate-pulse font-mono tracking-[0.2em] mt-1 uppercase">● Engine Online & Synced</p>
+            </div>
+            
+            <div class="flex flex-wrap gap-4 mb-4 md:mb-0">
+                <button onclick="openCreateModal('personal_works')" class="bg-blue-600/20 text-blue-400 px-4 py-2 rounded-lg text-xs font-bold border border-blue-600/30 hover:bg-blue-600 hover:text-white transition-all">+ Personal</button>
+                <button onclick="openCreateModal('client_works')" class="bg-green-600/20 text-green-400 px-4 py-2 rounded-lg text-xs font-bold border border-green-600/30 hover:bg-green-600 hover:text-white transition-all">+ Client Work</button>
+                <button onclick="openCreateModal('micro_components')" class="bg-purple-600/20 text-purple-400 px-4 py-2 rounded-lg text-xs font-bold border border-purple-600/30 hover:bg-purple-600 hover:text-white transition-all">+ Micro</button>
+            </div>
+            
+            <button id="logoutBtn" class="px-5 py-2 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg hover:bg-red-500 hover:text-white transition-all text-xs font-bold">Logout System</button>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            <div class="glass-card p-5 border-b-2 border-accentPurple bg-white/[0.02]">
+                <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Revenue</p>
+                <h2 id="stat-revenue" class="text-2xl font-bold mt-1 text-green-400">₹0</h2>
+            </div>
+            <div class="glass-card p-5 border-b-2 border-blue-500 bg-white/[0.02]">
+                <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Workspaces</p>
+                <h2 id="stat-active" class="text-2xl font-bold mt-1">0</h2>
+            </div>
+            <div class="glass-card p-5 border-b-2 border-yellow-500 bg-white/[0.02]">
+                <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">New Leads</p>
+                <h2 id="stat-pending" class="text-2xl font-bold mt-1">0</h2>
+            </div>
+            <div class="glass-card p-5 border-b-2 border-green-500 bg-white/[0.02]">
+                <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Completed</p>
+                <h2 id="stat-done" class="text-2xl font-bold mt-1 text-gray-400">0</h2>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-white/5 mb-8 gap-4 pb-4">
+            <div class="flex gap-8">
+                <button onclick="switchTab('leads')" id="tab-leads" class="text-sm font-bold text-accentPurple border-b-2 border-accentPurple pb-4 transition-all -mb-[17px]">Incoming Requests</button>
+                <button onclick="switchTab('workspaces')" id="tab-workspaces" class="text-sm font-bold text-gray-500 pb-4 hover:text-white transition-all -mb-[17px]">Project Workspaces</button>
+                <button onclick="switchTab('history')" id="tab-history" class="text-sm font-bold text-gray-500 pb-4 hover:text-white transition-all -mb-[17px]">Audit Logs</button>
+            </div>
+            
+            <div class="w-full md:w-64">
+                <input type="text" onkeyup="searchDashboard(this.value)" placeholder="Search by Name or Email..." class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-xs text-white outline-none focus:border-accentPurple transition-all">
+            </div>
+        </div>
+
+        <div id="main-content-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
+            </div>
+    </section>
+
+    <div id="mgmtModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/90 backdrop-blur-md p-4 overflow-y-auto">
+        <div class="glass-card w-full max-w-2xl p-6 md:p-10 relative border-t-4 border-t-accentPurple my-auto animate-in fade-in zoom-in duration-300">
+            <button onclick="closeMgmtModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl transition-colors">&times;</button>
+            
+            <div class="mb-8">
+                <h2 id="modalClientName" class="text-3xl font-bold">Client Name</h2>
+                <p id="modalProjectId" class="text-[10px] text-gray-500 font-mono mt-1 uppercase tracking-tighter"></p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <h3 class="text-accentPurple font-bold uppercase text-[10px] tracking-[0.2em] mb-4">Finance & Revenue</h3>
+                    <div class="space-y-4 bg-white/5 p-4 rounded-xl border border-white/5">
+                        <div class="space-y-1">
+                            <label class="text-[10px] text-gray-500 uppercase font-bold">Total Price (₹)</label>
+                            <input type="number" id="mTotal" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-accentPurple">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] text-gray-500 uppercase font-bold">Paid Amount (₹)</label>
+                            <input type="number" id="mPaid" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-green-400 font-bold outline-none focus:border-accentPurple">
+                        </div>
+                        <div id="mBargainBox" class="hidden p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                            <p class="text-[10px] text-yellow-500 font-bold">BARGAIN REQUESTED: <span id="mBargainAmt" class="text-white ml-1">₹0</span></p>
+                            <div class="flex gap-2 mt-2">
+                                <button onclick="handleBargainAction('approve')" class="flex-1 bg-yellow-600 text-[10px] py-1 rounded text-white font-bold">Accept</button>
+                                <button onclick="handleBargainAction('reject')" class="flex-1 bg-red-600/20 text-[10px] py-1 rounded text-red-500 font-bold">Deny</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-accentPurple font-bold uppercase text-[10px] tracking-[0.2em] mb-4">Project Engine</h3>
+                    <div class="space-y-4 bg-white/5 p-4 rounded-xl border border-white/5">
+                        <div class="space-y-1">
+                            <label class="text-[10px] text-gray-500 uppercase font-bold">Project Status</label>
+                            <select id="mStatus" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-accentPurple cursor-pointer">
+                                <option value="Architecture in Progress">Architecture in Progress</option>
+                                <option value="Developing">Developing</option>
+                                <option value="Reviewing Assets">Reviewing Assets</option>
+                                <option value="Testing Phase">Testing Phase</option>
+                                <option value="Live">Live / Handover</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] text-gray-500 uppercase font-bold">Preview Tunnel URL</label>
+                            <input type="text" id="mUrl" placeholder="https://..." class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs outline-none focus:border-accentPurple">
+                        </div>
+                        <label class="flex items-center gap-3 cursor-pointer pt-2 group">
+                            <input type="checkbox" id="mPreviewActive" class="w-4 h-4 accent-accentPurple cursor-pointer">
+                            <span class="text-xs text-gray-400 group-hover:text-white transition-colors">Public Preview Access</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-8 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <h3 class="text-accentPurple font-bold uppercase text-[10px] tracking-[0.2em]">Scope & Timer</h3>
+                    <div class="flex gap-2">
+                        <button id="mBtnTimer" onclick="startScopeTimer()" class="flex-1 bg-blue-600/20 text-blue-400 border border-blue-600/30 text-[10px] py-2 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition-all uppercase">Start 48h Timer</button>
+                        <button id="mBtnLock" onclick="forceLock()" class="flex-1 bg-red-600/20 text-red-500 border border-red-600/30 text-[10px] py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-all uppercase">Force Lock</button>
+                    </div>
+                    <p id="mTimerStatus" class="text-[10px] text-gray-500 font-mono">Status: Awaiting Action</p>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-accentPurple font-bold uppercase text-[10px] tracking-[0.2em]">Asset Vault</h3>
+                    <input type="text" id="mAssets" placeholder="Google Drive / Dropbox Link" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs outline-none focus:border-accentPurple">
+                </div>
+            </div>
+
+            <button onclick="saveProjectChanges()" class="w-full bg-accentPurple mt-10 py-4 rounded-xl font-bold hover:scale-[1.01] active:scale-95 transition-all shadow-[0_0_30px_rgba(139,92,246,0.3)] uppercase tracking-widest text-sm">Save System State</button>
+        </div>
+    </div>
+
+    <div id="leadDetailsModal" class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/95 backdrop-blur-md p-4 overflow-y-auto">
+        <div class="glass-card w-full max-w-2xl p-8 relative border-t-4 border-t-accentPurple my-auto">
+            <button onclick="closeLeadModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl">&times;</button>
+            
+            <div class="mb-6">
+                <h2 id="ldName" class="text-3xl font-bold text-white">Client Name</h2>
+                <p id="ldType" class="text-accentPurple font-bold text-xs uppercase tracking-widest mt-1">Project Type</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-sm">
+                <div class="space-y-4">
+                    <p class="text-gray-400">📧 Email: <span id="ldEmail" class="text-white block"></span></p>
+                    <p class="text-gray-400">📱 WhatsApp: <span id="ldWhatsapp" class="text-white block"></span></p>
+                    <p class="text-gray-400">💰 Budget: <span id="ldBudget" class="text-white block"></span></p>
+                </div>
+                <div class="space-y-4">
+                    <p class="text-gray-400">⏳ Timeline: <span id="ldTimeline" class="text-white block"></span></p>
+                    <p class="text-gray-400">🔗 Reference: <a id="ldRef" href="#" target="_blank" class="text-blue-400 block break-all hover:underline">View Link</a></p>
+                </div>
+            </div>
+
+            <div class="bg-white/5 p-6 rounded-xl border border-white/10 mb-8">
+                <h3 class="text-white font-bold mb-2 text-sm uppercase">Features Requested:</h3>
+                <p id="ldFeatures" class="text-gray-300 leading-relaxed text-sm"></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <input type="hidden" id="currentLeadId">
+                <button id="btnApproveMain" class="bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-all">Approve & Onboard</button>
+                <button id="btnRejectMain" class="bg-red-600/20 text-red-500 border border-red-500/30 font-bold py-3 rounded-xl hover:bg-red-600 hover:text-white transition-all">Reject Lead</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="createModal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/95 p-4">
+        <div class="glass-card w-full max-w-md p-8 relative border-t-4 border-t-blue-500">
+            <button onclick="closeCreateModal()" class="absolute top-4 right-4 text-gray-500 text-2xl">&times;</button>
+            <h2 id="createTitle" class="text-xl font-bold mb-6 text-white">Add New</h2>
+            
+            <form id="createForm" class="space-y-4">
+                <input type="hidden" id="targetCollection">
+                <input type="text" id="cTitle" placeholder="Project Title (title)" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500">
+                <input type="text" id="cImage" placeholder="Image URL (image_url)" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500">
+                <input type="text" id="cLive" placeholder="Live Link (live_link)" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500">
+                <input type="text" id="cTech" placeholder="Tech Stack (tech_stack) e.g. React, Firebase" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500">
+                
+                <div id="microOnly" class="hidden">
+                    <input type="text" id="cRepo" placeholder="Repo Link (repo_link)" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500">
+                </div>
+                
+                <button type="submit" class="w-full bg-blue-600 py-3 rounded-xl font-bold text-white hover:bg-blue-500 transition-all">Publish to Site</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="liveToast" class="fixed bottom-10 right-10 z-[100] translate-y-20 opacity-0 transition-all duration-500 glass-card px-6 py-4 border-l-4 border-l-green-500 flex items-center gap-4 pointer-events-none">
+        <div class="w-2 h-2 rounded-full bg-green-500 animate-ping"></div>
+        <div>
+            <h4 class="text-white font-bold text-[10px] uppercase tracking-tighter">Sync Notification</h4>
+            <p id="toastMsg" class="text-gray-400 text-[9px] uppercase">State Updated Successfully.</p>
+        </div>
+    </div>
+
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script defer src="js/firebase-config.js"></script>
+    <script defer src="js/admin.js"></script>
+</body>
+</html>

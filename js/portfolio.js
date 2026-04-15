@@ -81,8 +81,6 @@ window.scrollToForm = function(projectName, category) {
             if(budgetSelect) budgetSelect.value = ""; 
             if(typeSelect) typeSelect.value = ""; 
         }
-
-        // Mobile smooth scroll fix
         setTimeout(() => { formSection.scrollIntoView({ behavior: 'smooth' }); }, 100);
     }
 };
@@ -93,12 +91,9 @@ const modalContent = document.getElementById('modalContentBox');
 
 window.openComponentModal = function(title, repoUrl, liveUrl) {
     document.getElementById('modalTitle').textContent = title;
-    
-    // Direct link update
     document.getElementById('modalLiveLink').href = liveUrl || '#';
     document.getElementById('modalRepoLink').href = repoUrl || '#';
     
-    // Show Modal with Animation
     if(compModal && modalContent) {
         compModal.classList.remove('hidden');
         compModal.classList.add('flex');
@@ -106,8 +101,6 @@ window.openComponentModal = function(title, repoUrl, liveUrl) {
             compModal.classList.remove('opacity-0');
             modalContent.classList.remove('scale-95');
         }, 10);
-        
-        // Puraana form hide/show karne wala code yahan se hata diya gaya hai taaki error na aaye
     }
 };
 
@@ -130,6 +123,23 @@ window.triggerPaidCustomization = function() {
     }, 400);
 };
 
+// ================= MODAL LOGIC FOR CRITERIA (T&C) ================= //
+window.openCriteriaModal = function() {
+    const criteriaModal = document.getElementById('criteriaModal');
+    if(criteriaModal) {
+        criteriaModal.classList.remove('hidden');
+        criteriaModal.classList.add('flex');
+    }
+};
+
+window.closeCriteriaModal = function() {
+    const criteriaModal = document.getElementById('criteriaModal');
+    if(criteriaModal) {
+        criteriaModal.classList.add('hidden');
+        criteriaModal.classList.remove('flex');
+    }
+};
+
 // ================= CREATE CARD LOGIC ================= //
 function createCard(project, category) {
     const rawTitle = project.title || 'Untitled Core';
@@ -149,7 +159,6 @@ function createCard(project, category) {
             </button>
         `;
     } else { 
-        // Micro Components (Opens the Free Modal)
         actionButtons = `
             <button onclick="window.openComponentModal('${safeTitle}', '${safeRepo}', '${safeLive}')" class="w-full px-4 py-3 bg-accentPurple text-white rounded-lg text-sm font-bold hover:bg-purple-500 active:scale-95 transition-all shadow-[0_0_15px_rgba(139,92,246,0.3)] cursor-pointer">
                 Unlock Free Component
@@ -194,10 +203,9 @@ if (typeof db !== 'undefined') {
 
 
 /* ==========================================
-   5. Form Submission Logics (Firebase)
+   5. Form Submission Logics (Firebase + Netlify Auto-Email/Telegram)
 ========================================== */
 
-// A. MAIN LEAD FORM
 const leadForm = document.getElementById('leadForm');
 const formMessage = document.getElementById('formMessage');
 
@@ -206,34 +214,86 @@ if (leadForm) {
         e.preventDefault(); 
         const submitBtn = leadForm.querySelector('button[type="submit"]');
         const originalBtnText = submitBtn.textContent;
-        submitBtn.textContent = 'Processing...';
+        submitBtn.textContent = 'Processing & Securing...';
         submitBtn.disabled = true;
 
-        try {
-            await db.collection('inquiries').add({
-                reference: document.getElementById('leadReference') ? document.getElementById('leadReference').value : '',
-                project_type: document.getElementById('leadProjectType') ? document.getElementById('leadProjectType').value : '',
-                features: document.getElementById('leadFeatures') ? document.getElementById('leadFeatures').value : '',
-                name: document.getElementById('leadName').value,
-                email: document.getElementById('leadEmail') ? document.getElementById('leadEmail').value : '',
-                whatsapp: document.getElementById('leadWhatsapp').value,
-                budget: document.getElementById('leadBudget').value,
-                timeline: document.getElementById('leadTimeline').value,
-                status: 'pending', 
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
+        // Data Capture
+        const leadData = {
+            reference: document.getElementById('leadReference') ? document.getElementById('leadReference').value : '',
+            projectType: document.getElementById('leadProjectType') ? document.getElementById('leadProjectType').value : '', 
+            features: document.getElementById('leadFeatures') ? document.getElementById('leadFeatures').value : '',
+            name: document.getElementById('leadName').value,
+            email: document.getElementById('leadEmail') ? document.getElementById('leadEmail').value : '',
+            whatsapp: document.getElementById('leadWhatsapp').value,
+            budget: document.getElementById('leadBudget').value,
+            timeline: document.getElementById('leadTimeline').value,
+            status: 'pending', 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        };
 
-            formMessage.textContent = "Request Submitted. You will be contacted if approved.";
-            formMessage.className = "text-center text-sm mt-4 text-green-400 block";
+        try {
+            // 1. Firebase Database mein save karein
+            await db.collection('inquiries').add(leadData);
+
+            // 2. Netlify API Call (Ab ye ek call Telegram notification aur Client Email dono ka kaam karega)
+            try {
+                const response = await fetch('/.netlify/functions/notifyAdmin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(leadData)
+                });
+                const result = await response.json();
+                console.log("Backend Response:", result);
+            } catch (apiError) {
+                console.warn("Local PC par Telegram/Email bypass ho gaya. (Live deploy hone par chalega)");
+            }
+
+            // 3. Success Message UI
+            submitBtn.textContent = 'Architecture Request Secured!';
+            submitBtn.classList.replace('bg-accentPurple', 'bg-green-500');
             leadForm.reset();
+            
+            setTimeout(() => {
+                submitBtn.textContent = 'Submit Architecture Request';
+                submitBtn.classList.replace('bg-green-500', 'bg-accentPurple');
+                submitBtn.disabled = false;
+            }, 4000);
+
         } catch (error) {
-            console.error("Error submitting request:", error);
-            formMessage.textContent = "System Error. Please try again later.";
-            formMessage.className = "text-center text-sm mt-4 text-red-400 block";
-        } finally {
-            submitBtn.textContent = originalBtnText;
+            console.error("Error submitting form: ", error);
+            submitBtn.textContent = 'Database Error. Please Try Again.';
             submitBtn.disabled = false;
-            setTimeout(() => { formMessage.classList.add('hidden'); }, 5000);
         }
     });
 }
+
+// ==========================================
+// 🚀 THE SHRINK-TO-FIT MAGIC (For Typewriter)
+// ==========================================
+function setupShrinkToFit() {
+    const box = document.getElementById('typewriter-box');
+    const wrapper = document.getElementById('shrink-wrapper');
+    const typewriterSpan = document.getElementById('typewriter');
+
+    if (!box || !wrapper || !typewriterSpan) return;
+
+    const adjustSize = () => {
+        wrapper.style.transform = 'scale(1)';
+        const boxWidth = box.clientWidth;
+        const textWidth = wrapper.scrollWidth;
+
+        if (textWidth > boxWidth) {
+            const scaleRatio = boxWidth / textWidth;
+            wrapper.style.transform = `scale(${scaleRatio * 0.98})`; 
+        }
+    };
+
+    const observer = new MutationObserver(() => {
+        adjustSize();
+    });
+
+    observer.observe(typewriterSpan, { childList: true, characterData: true, subtree: true });
+    window.addEventListener('resize', adjustSize);
+}
+
+setupShrinkToFit();

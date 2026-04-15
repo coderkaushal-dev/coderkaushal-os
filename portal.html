@@ -3,31 +3,20 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="VIP Client Portal - Secure Gateway for CoderKaushal Architecture and Delivery.">
+    
     <title>VIP Access | CoderKaushal OS</title>
 
     <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        zincBlack: '#030712',
-                        accentPurple: '#8b5cf6',
-                    }
-                }
-            }
-        }
-    </script>
+    
     <link rel="stylesheet" href="css/style.css">
-
 </head>
 
 <body
     class="bg-zincBlack text-white min-h-screen overflow-x-hidden selection:bg-accentPurple selection:text-white font-sans">
 
-    <div class="fixed inset-0 z-0 pointer-events-none opacity-5 mix-blend-overlay bg-[url('assets/noise.png')]"></div>
+    <div class="fixed inset-0 z-0 pointer-events-none opacity-[0.03] mix-blend-overlay bg-noise"></div>
 
     <nav
         class="fixed top-0 w-full z-40 backdrop-blur-xl bg-zincBlack/80 border-b border-white/5 px-6 py-4 flex justify-between items-center">
@@ -429,11 +418,12 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-    <script src="js/firebase-config.js"></script>
-    <script src="js/portal.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script defer src="js/firebase-config.js"></script>
+    
+    <script defer src="js/portfolio.js"></script>
+    <script defer src="js/portal.js"></script>
 </body>
 
 </html>
