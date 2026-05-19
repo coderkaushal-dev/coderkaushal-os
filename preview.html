@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Architecture Preview</title>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #000; overflow: hidden; font-family: monospace; user-select: none; }
+        #loader { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #8b5cf6; z-index: 10; background: #000; }
+        iframe { width: 100%; height: 100%; border: none; z-index: 1; position: relative; }
+        
+        /* Security Overlay for extra protection against screenshots/inspection */
+        .security-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 9999; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.05), rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px); }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="security-overlay"></div>
+    <div id="loader">Establishing Secure Tunnel...</div>
+    <iframe id="clientFrame" src="" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script> <script>
+        // --- 1. ANTI-INSPECT LOGIC ---
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) return false; // F12
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Ctrl+Shift+C
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+        }
+
+        // --- 2. FETCH URL LOGIC ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const workspaceId = urlParams.get('id');
+
+        if(workspaceId) {
+            db.collection('client_workspaces').doc(workspaceId).get().then(doc => {
+                if(doc.exists) {
+                    const data = doc.data();
+                    if(data.is_preview_active && data.tunnel_url) {
+                        document.getElementById('clientFrame').src = data.tunnel_url;
+                        setTimeout(() => document.getElementById('loader').style.display = 'none', 1000);
+                    } else {
+                        document.getElementById('loader').innerText = "ACCESS DENIED: Tunnel is closed.";
+                        document.getElementById('loader').style.color = "red";
+                    }
+                } else {
+                    document.getElementById('loader').innerText = "INVALID SESSION.";
+                }
+            }).catch(e => {
+                document.getElementById('loader').innerText = "CONNECTION ERROR.";
+            });
+        } else {
+            document.getElementById('loader').innerText = "NO WORKSPACE ID PROVIDED.";
+        }
+    </script>
+</body>
+</html>

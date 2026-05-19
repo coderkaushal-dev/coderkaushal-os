@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <rect width="500" height="500" fill="#060913" />
+
+  <g transform="translate(0, -20)">
+    <polyline 
+      points="165,160 65,260 165,360" 
+      fill="none" 
+      stroke="#a78bfa" 
+      stroke-width="16" 
+      stroke-linecap="round" 
+      stroke-linejoin="round" 
+    />
+
+    <polyline 
+      points="335,160 435,260 335,360" 
+      fill="none" 
+      stroke="#a78bfa" 
+      stroke-width="16" 
+      stroke-linecap="round" 
+      stroke-linejoin="round" 
+    />
+
+    <polyline 
+      points="305,170 236,260 305,350" 
+      fill="none" 
+      stroke="#2dd4bf" 
+      stroke-width="16" 
+      stroke-linecap="round" 
+      stroke-linejoin="round" 
+    />
+
+    <polygon 
+      points="245,155 260,157.5 225,365 210,362.5" 
+      fill="#ffffff" 
+    />
+  </g>
+
+  <text 
+    x="250" 
+    y="435" 
+    font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" 
+    font-size="44" 
+    font-weight="800" 
+    text-anchor="middle" 
+    letter-spacing="0.5"
+  >
+    <tspan fill="#ffffff">Coder</tspan>
+    <tspan fill="#2dd4bf" dx="14">Kaushal</tspan>
+  </text>
+</svg>
